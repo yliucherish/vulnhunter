@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>VulnHunter 扫描报告 - http://127.0.0.1</title>
+<style>
+  body { font-family: "Segoe UI", sans-serif; background:#0f1620; color:#e6edf3;
+         max-width:900px; margin:40px auto; padding:0 20px; }
+  h1 { color:#5b8cff; } h3 { color:#cdd9e5; }
+  .meta { color:#8b98a5; margin-bottom:30px; }
+  .stats { background:#1a2332; border:1px solid #2d3a4d; border-radius:10px;
+            padding:12px 20px; margin-bottom:20px; font-size:14px; }
+  .stats b { color:#5b8cff; }
+  .warn { color:#f0a35e; }
+  .vuln { background:#1a2332; border:1px solid #2d3a4d; border-radius:10px;
+           padding:16px 20px; margin-bottom:16px; }
+  .sev { font-size:12px; color:#fff; border-radius:4px; padding:2px 8px; vertical-align:middle; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { text-align:left; width:90px; color:#8b98a5; padding:4px; vertical-align:top; }
+  td { padding:4px; word-break:break-all; }
+  code { background:#0d1117; padding:2px 6px; border-radius:4px; color:#a78bfa; }
+</style></head><body>
+<h1>VulnHunter 扫描报告</h1>
+<p class="meta">目标: http://127.0.0.1 | 时间: 2026-10-22 23:01:11 |
+共发现 <b>5</b> 个漏洞</p>
+<div class="stats">
+  爬取页面 <b>26</b> ｜ 注入点 <b>28</b> ｜
+  完成检测 <b>92/112</b> ｜
+  请求失败 <b>20</b> 次 
+</div>
+
+        <div class="vuln">
+          <h3>#1 Reflected XSS
+            <span class="sev" style="background:#e67e22">MEDIUM</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/xss_r/</td></tr>
+            <tr><th>参数</th><td><code>name</code></td></tr>
+            <tr><th>Payload</th><td><code>&lt;svg/onload=alert(f76a3fa496)&gt;</code></td></tr>
+            <tr><th>判定依据</th><td>payload 在 HTML 文本上下文 中未被编码，原样反射</td></tr>
+            <tr><th>修复建议</th><td>对输出按上下文编码（HTML/属性/JS 分别处理）；启用 CSP；输入侧白名单过滤。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#2 Reflected XSS
+            <span class="sev" style="background:#e67e22">MEDIUM</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/xss_s/</td></tr>
+            <tr><th>参数</th><td><code>txtName</code></td></tr>
+            <tr><th>Payload</th><td><code>&lt;svg/onload=alert(ef4d121c03)&gt;</code></td></tr>
+            <tr><th>判定依据</th><td>payload 在 HTML 文本上下文 中未被编码，原样反射</td></tr>
+            <tr><th>修复建议</th><td>对输出按上下文编码（HTML/属性/JS 分别处理）；启用 CSP；输入侧白名单过滤。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#3 Reflected XSS
+            <span class="sev" style="background:#e67e22">MEDIUM</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/csp/</td></tr>
+            <tr><th>参数</th><td><code>include</code></td></tr>
+            <tr><th>Payload</th><td><code>&lt;svg/onload=alert(7879152c0d)&gt;</code></td></tr>
+            <tr><th>判定依据</th><td>payload 在 HTML 文本上下文 中未被编码，原样反射</td></tr>
+            <tr><th>修复建议</th><td>对输出按上下文编码（HTML/属性/JS 分别处理）；启用 CSP；输入侧白名单过滤。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#4 SQL Injection (Error-based)
+            <span class="sev" style="background:#e74c3c">HIGH</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/sqli/</td></tr>
+            <tr><th>参数</th><td><code>id</code></td></tr>
+            <tr><th>Payload</th><td><code>&#x27;</code></td></tr>
+            <tr><th>判定依据</th><td>数据库错误特征: check the manual that corresponds to your MariaDB</td></tr>
+            <tr><th>修复建议</th><td>使用参数化查询/预编译语句，禁止拼接 SQL；对输入做类型与白名单校验。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#5 Command Injection (Echo)
+            <span class="sev" style="background:#999">CRITICAL</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/exec/</td></tr>
+            <tr><th>参数</th><td><code>ip</code></td></tr>
+            <tr><th>Payload</th><td><code>test | echo $((9453*9692))</code></td></tr>
+            <tr><th>判定依据</th><td>命令被执行：响应中出现计算结果 91618476（payload 原文不含该值）</td></tr>
+            <tr><th>修复建议</th><td>禁止将用户输入拼接进 shell；改用 subprocess 列表参数形式；必要时做严格的白名单过滤。</td></tr>
+          </table>
+        </div>
+</body></html>
