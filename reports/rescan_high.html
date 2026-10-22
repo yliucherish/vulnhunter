@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>VulnHunter 扫描报告 - http://127.0.0.1/dvwa</title>
+<style>
+  body { font-family: "Segoe UI", sans-serif; background:#0f1620; color:#e6edf3;
+         max-width:900px; margin:40px auto; padding:0 20px; }
+  h1 { color:#5b8cff; } h3 { color:#cdd9e5; }
+  .meta { color:#8b98a5; margin-bottom:30px; }
+  .stats { background:#1a2332; border:1px solid #2d3a4d; border-radius:10px;
+            padding:12px 20px; margin-bottom:20px; font-size:14px; }
+  .stats b { color:#5b8cff; }
+  .warn { color:#f0a35e; }
+  .vuln { background:#1a2332; border:1px solid #2d3a4d; border-radius:10px;
+           padding:16px 20px; margin-bottom:16px; }
+  .sev { font-size:12px; color:#fff; border-radius:4px; padding:2px 8px; vertical-align:middle; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { text-align:left; width:90px; color:#8b98a5; padding:4px; vertical-align:top; }
+  td { padding:4px; word-break:break-all; }
+  code { background:#0d1117; padding:2px 6px; border-radius:4px; color:#a78bfa; }
+</style></head><body>
+<h1>VulnHunter 扫描报告</h1>
+<p class="meta">目标: http://127.0.0.1/dvwa | 时间: 2026-10-23 04:59:22 |
+共发现 <b>3</b> 个漏洞</p>
+<div class="stats">
+  爬取页面 <b>38</b> ｜ 注入点 <b>21</b> ｜
+  完成检测 <b>82/84</b> ｜
+  请求失败 <b>2</b> 次 ｜ 慢端点 <b>8</b> 个（单次请求过慢，已转入串行通道） 
+</div>
+
+        <div class="vuln">
+          <h3>#1 Reflected XSS
+            <span class="sev" style="background:#e67e22">MEDIUM</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/xss_r/</td></tr>
+            <tr><th>参数</th><td><code>name</code></td></tr>
+            <tr><th>Payload</th><td><code>&lt;svg/onload=alert(60bcb36f5a)&gt;</code></td></tr>
+            <tr><th>判定依据</th><td>payload 在 HTML 文本上下文 中未被编码，原样反射</td></tr>
+            <tr><th>修复建议</th><td>对输出按上下文编码（HTML/属性/JS 分别处理）；启用 CSP；输入侧白名单过滤。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#2 Reflected XSS
+            <span class="sev" style="background:#e67e22">MEDIUM</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/xss_s/</td></tr>
+            <tr><th>参数</th><td><code>txtName</code></td></tr>
+            <tr><th>Payload</th><td><code>&lt;svg/onload=alert(76b81e3f9c)&gt;</code></td></tr>
+            <tr><th>判定依据</th><td>payload 在 HTML 文本上下文 中未被编码，原样反射</td></tr>
+            <tr><th>修复建议</th><td>对输出按上下文编码（HTML/属性/JS 分别处理）；启用 CSP；输入侧白名单过滤。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#3 Command Injection (Time-based Blind)
+            <span class="sev" style="background:#999">CRITICAL</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/exec/</td></tr>
+            <tr><th>参数</th><td><code>ip</code></td></tr>
+            <tr><th>Payload</th><td><code>test
+sleep 5</code></td></tr>
+            <tr><th>判定依据</th><td>注入 sleep(3)/sleep(5) 两轮测量：第一轮耗时 21.03s/23.03s（基线 18.10s），第二轮 21.01s/23.01s（基线 18.01s），长短差值两轮均 &gt;1.5s，与注入时长成比例</td></tr>
+            <tr><th>修复建议</th><td>禁止拼接用户输入到系统命令；使用参数化 API 替代 shell 调用。</td></tr>
+          </table>
+        </div>
+</body></html>

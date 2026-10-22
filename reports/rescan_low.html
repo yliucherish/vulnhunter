@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>VulnHunter 扫描报告 - http://127.0.0.1/dvwa</title>
+<style>
+  body { font-family: "Segoe UI", sans-serif; background:#0f1620; color:#e6edf3;
+         max-width:900px; margin:40px auto; padding:0 20px; }
+  h1 { color:#5b8cff; } h3 { color:#cdd9e5; }
+  .meta { color:#8b98a5; margin-bottom:30px; }
+  .stats { background:#1a2332; border:1px solid #2d3a4d; border-radius:10px;
+            padding:12px 20px; margin-bottom:20px; font-size:14px; }
+  .stats b { color:#5b8cff; }
+  .warn { color:#f0a35e; }
+  .vuln { background:#1a2332; border:1px solid #2d3a4d; border-radius:10px;
+           padding:16px 20px; margin-bottom:16px; }
+  .sev { font-size:12px; color:#fff; border-radius:4px; padding:2px 8px; vertical-align:middle; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { text-align:left; width:90px; color:#8b98a5; padding:4px; vertical-align:top; }
+  td { padding:4px; word-break:break-all; }
+  code { background:#0d1117; padding:2px 6px; border-radius:4px; color:#a78bfa; }
+</style></head><body>
+<h1>VulnHunter 扫描报告</h1>
+<p class="meta">目标: http://127.0.0.1/dvwa | 时间: 2026-10-23 04:01:57 |
+共发现 <b>8</b> 个漏洞</p>
+<div class="stats">
+  爬取页面 <b>38</b> ｜ 注入点 <b>25</b> ｜
+  完成检测 <b>100/100</b> ｜
+  请求失败 <b>0</b> 次 ｜ 慢端点 <b>8</b> 个（单次请求过慢，已转入串行通道） 
+</div>
+
+        <div class="vuln">
+          <h3>#1 Reflected XSS
+            <span class="sev" style="background:#e67e22">MEDIUM</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/xss_r/</td></tr>
+            <tr><th>参数</th><td><code>name</code></td></tr>
+            <tr><th>Payload</th><td><code>&lt;svg/onload=alert(5185c9f5f4)&gt;</code></td></tr>
+            <tr><th>判定依据</th><td>payload 在 HTML 文本上下文 中未被编码，原样反射</td></tr>
+            <tr><th>修复建议</th><td>对输出按上下文编码（HTML/属性/JS 分别处理）；启用 CSP；输入侧白名单过滤。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#2 Reflected XSS
+            <span class="sev" style="background:#e67e22">MEDIUM</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/xss_s/</td></tr>
+            <tr><th>参数</th><td><code>txtName</code></td></tr>
+            <tr><th>Payload</th><td><code>&lt;svg/onload=alert(5c64f2859f)&gt;</code></td></tr>
+            <tr><th>判定依据</th><td>payload 在 HTML 文本上下文 中未被编码，原样反射</td></tr>
+            <tr><th>修复建议</th><td>对输出按上下文编码（HTML/属性/JS 分别处理）；启用 CSP；输入侧白名单过滤。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#3 Reflected XSS
+            <span class="sev" style="background:#e67e22">MEDIUM</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/xss_s/</td></tr>
+            <tr><th>参数</th><td><code>mtxMessage</code></td></tr>
+            <tr><th>Payload</th><td><code>&lt;svg/onload=alert(cb0b68ecc2)&gt;</code></td></tr>
+            <tr><th>判定依据</th><td>payload 在 HTML 文本上下文 中未被编码，原样反射</td></tr>
+            <tr><th>修复建议</th><td>对输出按上下文编码（HTML/属性/JS 分别处理）；启用 CSP；输入侧白名单过滤。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#4 Reflected XSS
+            <span class="sev" style="background:#e67e22">MEDIUM</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/csp/</td></tr>
+            <tr><th>参数</th><td><code>include</code></td></tr>
+            <tr><th>Payload</th><td><code>&quot; onmouseover=&quot;alert(76ea9eefd6)</code></td></tr>
+            <tr><th>判定依据</th><td>payload 在 HTML 属性上下文 中未被编码，原样反射</td></tr>
+            <tr><th>修复建议</th><td>对输出按上下文编码（HTML/属性/JS 分别处理）；启用 CSP；输入侧白名单过滤。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#5 SQL Injection (Error-based)
+            <span class="sev" style="background:#e74c3c">HIGH</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/brute/</td></tr>
+            <tr><th>参数</th><td><code>username</code></td></tr>
+            <tr><th>Payload</th><td><code>&#x27;</code></td></tr>
+            <tr><th>判定依据</th><td>数据库错误特征: check the manual that corresponds to your MariaDB</td></tr>
+            <tr><th>修复建议</th><td>使用参数化查询/预编译语句，禁止拼接 SQL；对输入做类型与白名单校验。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#6 SQL Injection (Error-based)
+            <span class="sev" style="background:#e74c3c">HIGH</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/sqli/</td></tr>
+            <tr><th>参数</th><td><code>id</code></td></tr>
+            <tr><th>Payload</th><td><code>&#x27;</code></td></tr>
+            <tr><th>判定依据</th><td>数据库错误特征: check the manual that corresponds to your MariaDB</td></tr>
+            <tr><th>修复建议</th><td>使用参数化查询/预编译语句，禁止拼接 SQL；对输入做类型与白名单校验。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#7 SQL Injection (Time-based Blind)
+            <span class="sev" style="background:#e74c3c">HIGH</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/sqli_blind/</td></tr>
+            <tr><th>参数</th><td><code>id</code></td></tr>
+            <tr><th>Payload</th><td><code>1&#x27; AND SLEEP(5) -- -</code></td></tr>
+            <tr><th>判定依据</th><td>注入 sleep(3)/sleep(5) 两轮测量：第一轮耗时 3.01s/5.01s（基线 0.01s），第二轮 3.04s/5.03s（基线 0.04s），长短差值两轮均 &gt;1.5s，与注入时长成比例</td></tr>
+            <tr><th>修复建议</th><td>使用参数化查询；限制数据库账号权限（禁止 SLEEP 等高权限函数需按需评估）。</td></tr>
+          </table>
+        </div>
+        <div class="vuln">
+          <h3>#8 Command Injection (Echo)
+            <span class="sev" style="background:#999">CRITICAL</span></h3>
+          <table>
+            <tr><th>URL</th><td>http://127.0.0.1/vulnerabilities/exec/</td></tr>
+            <tr><th>参数</th><td><code>ip</code></td></tr>
+            <tr><th>Payload</th><td><code>test;echo $((9539*9125))</code></td></tr>
+            <tr><th>判定依据</th><td>命令被执行：响应中出现计算结果 87043375（payload 原文不含该值）</td></tr>
+            <tr><th>修复建议</th><td>禁止将用户输入拼接进 shell；改用 subprocess 列表参数形式；必要时做严格的白名单过滤。</td></tr>
+          </table>
+        </div>
+</body></html>
