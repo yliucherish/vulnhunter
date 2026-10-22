@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 测试缓存
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 扫描器默认输出（每次运行重新生成；reports/ 下的 DVWA 实证报告为 curated 证据，保留）
+/report.html
+
+# 复扫临时产物
+/rescan_*
+
+# 编辑器
+.idea/
+.vscode/
+*.swp
+.DS_Store
