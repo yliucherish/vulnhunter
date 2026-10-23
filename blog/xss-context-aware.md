@@ -129,11 +129,13 @@ if payload in body:
 
 **high 档比 low 档少的两个，恰恰是判据正确的证明：**
 
-- **`xss_s/mtxMessage` 在 high 档被编码**——反射时 `<` 变成 `&lt;`，
-  payload 子串匹配失败 → **不报**。这是对的：编码过的输入确实是安全的。
-  扫描器在这里"不报"不是漏报，是**正确行为**。
-  （medium 档该参数同样未被检出——该档对它做了额外处理；
-  具体处理方式本次未回查源码验证，这里只如实记录现象。）
+- **`xss_s/mtxMessage` 从 medium 档起就被编码**——回查 DVWA 源码，medium 档对该参数的处理是
+  `strip_tags(addslashes())` → `mysqli_real_escape_string()` → **`htmlspecialchars()`** 三重，
+  反射时 `<` 变成 `&lt;`，payload 子串匹配失败 → **不报**。
+  这是对的：编码过的输入确实是安全的。扫描器在这里"不报"不是漏报，是**正确行为**。
+  同页面的 `txtName` 在 medium 档只被 `str_replace('<script>', '')` 删掉字面量，
+  `<svg/onload=...>` 不在删除列表里，所以照样注入成功、照样检出——
+  **同一个表单的两个参数，处理强度不同，检出结果就不同，这正说明逐参数检测的必要性。**
 - **`csp/include` 在 high 档也未被检出**——该参数在 high 档被限制为固定白名单值，
   输入不可控 → 无攻击面。
 
@@ -141,6 +143,28 @@ if payload in body:
 > DVWA high 档的 sqli/brute/mtxMessage 全部无攻击面（session 提供参数 / 转义 / 编码），
 > 我在 README 里把这些"未检出"的**源码级原因**逐条写清楚——
 > 能解释清楚为什么没报，比报一个漂亮的数字更重要。
+
+### 一个意外收获：SQL 报错页也是 XSS 反射点
+
+medium 档的检出里有个乍看奇怪的条目：**`sqli/id` 被报了 Reflected XSS**。
+一个 SQL 注入页面怎么会有 XSS？回查源码，原因非常确定——DVWA medium 档 sqli 的查询是：
+
+```php
+$query = "SELECT first_name, last_name FROM users WHERE user_id = $id;";
+$result = mysqli_query(...) or die('<pre>' . mysqli_error(...) . '</pre>');
+```
+
+注意 `$id` **没有被引号包裹**。我的 XSS payload `<svg/onload=alert(x)>` 不含引号，
+却因为整个被拼进 SQL 而引发语法错误，`mysqli_error()` 把出错的查询原文
+（含完整 payload）原样输出到 `<pre>` 里，没有任何 HTML 实体编码——判据成立。
+
+对照组是 low 档，同一页面的查询是 `WHERE user_id = '$id'`：
+payload 不含引号时查询正常执行、不报错、不反射，
+所以 low 档的 `sqli/id` 只有 SQL 注入检出、没有 XSS 检出。
+
+**同一个参数，在两个安全等级下检出类型不同，原因全在源码里。**
+这也是我把"未检出也要给源码级解释"写进 README 的原因——
+扫描器的输出只有能追溯到源码，才敢拿给面试官看。
 
 ### 一个额外收获：CSP 场景
 
@@ -171,6 +195,14 @@ DVWA 有个 `csp` 页面，输入会被放进 Content-Security-Policy 的 `scrip
 4. **Q：DVWA high 档你为什么少报？**
    A：它的参数改由 session 提供、输入被 `htmlspecialchars`/`escape_string` 处理，
    HTTP 层没有攻击面。这些未检出我在文档里逐条给了源码级解释。
+   （补充：medium 档的 `mtxMessage` 从这一档起就被 `htmlspecialchars()` 处理，
+   我的 payload 匹配天然失败——**判据自带误报控制，不用为"少报"写任何特例代码**。）
+
+5. **Q：有没有哪个检出结果一开始让你意外？**
+   A：有，medium 档 `sqli/id` 被报了 Reflected XSS——一个 SQL 注入页面怎么会有 XSS？
+   回查源码：medium 档查询没给 `$id` 包引号，payload 引发 SQL 语法错误，
+   `mysqli_error()` 把 payload 原样输出；low 档有引号包裹就不反射。
+   这个案例让我更确信一件事：**检测结果必须能追溯到源码，否则连自己都不敢信。**
 
 ---
 
