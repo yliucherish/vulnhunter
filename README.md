@@ -39,6 +39,8 @@ cli.py → engine.py（并发调度，Semaphore 限流，统一注入登录 Cook
 report.py（HTML 报告，含覆盖率与慢端点统计）
 ```
 
+![架构图](docs/architecture.svg)
+
 **测试**：`pytest tests/ -v`（15 个用例：检测器真阳性/真阴性对称设计 +
 v0.3.2 调度回归——爬虫字段名过滤 / 慢端点标记 / 串行通道 / 重试判别式 / 端到端场景）
 
