@@ -1,5 +1,7 @@
 # VulnHunter — Web 漏洞扫描器
 
+[![CI](https://github.com/yliucherish/vulnhunter/actions/workflows/ci.yml/badge.svg)](https://github.com/yliucherish/vulnhunter/actions/workflows/ci.yml)
+
 > 一个自研的轻量级 Web 漏洞扫描器，覆盖 SQL 注入、XSS、命令注入、SSRF 等
 > OWASP Top 10 常见漏洞的自动化检测。
 >
